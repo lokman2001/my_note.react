@@ -1,59 +1,104 @@
 import Header from './components/header'
-import NoteList from './components/noteList'
 import './App.css'
 import { useState } from 'react'
-import Notes from './components/note'
-import NoteData from './components/NotesData'
+import SideOne from './components/SideOne';
+import List1 from './components/List1';
+import Item1 from './components/Item1';
+import Item2 from './components/Item2';
+import Form from './components/Form';
+import SideTwo from './components/SideTwo';
+import List2 from './components/List2';
+
 
 function App() {
 
-  const [Note , setNote] = useState([
+  let tempData = [];
+
+  const [Notes, setNotes] = useState([
     {
-      id : 1 ,
-      name : "Note 1",
-      data : []
+      id: 1,
+      name: "Note 1",
+      notes: [{
+        id: 1,
+        note: "this is the sample Note"
+      },]
     }
   ]);
-  const[detail, setDetail] = useState()
+  const [Detail, setDetail] = useState([])
 
-  let Create = (name) => {
-    let data = [];
+  let Create = (val) => {
+    console.log(val)
     let id;
-    if(Note.length === 0){
+    if (Notes.length === 0) {
       id = 1
-    }else{
-      id = Note[Note.length -1].id + 1;
+    } else {
+      id = Notes[Notes.length - 1].id + 1;
     }
-    setNote([...Note,{id , name , data}])
+    let data = {
+      id: id,
+      name: val,
+      notes: [{
+        id: 1,
+        note: "this is the sample Note"
+      },]
+    };
+    setNotes([...Notes, data])
 
   }
+
   let remove = (id) => {
-    setNote(Note.filter((note)=>note.id !== id));
+    setNotes(Notes.filter((note) => note.id !== id));
+    if (id === Detail[0].id) {
+      setDetail([]);
+    }
+
   }
+
   let showData = (id) => {
-    let data =  Note.filter(note => note.id === id).data
-    let name = Note.filter(note => note.id === id).name
-    setDetail([id , name , data])
-    console.log(detail)
-    
+    let d = Notes.filter(note => note.id === id)
+    setDetail(d)
+
+    console.log(tempData)
   }
+
+  let addNote = (note) => {
+    let data = Detail[0]
+    let notes = data.notes
+    let id = notes[notes.length - 1].id + 1;
+    notes = [...notes, { id, note }]
+    data.notes = notes
+    setDetail([data])
+    console.log(notes)
+  }
+
 
   return (
     <>
       <Header></Header>
-      <div className='mx-5 flex '>
-        <div className="border-2 rounded-md w-1/3 px-2 py-2">
-          <NoteList Create={Create} />
-          <ul>
-              {Note.map( note => {
-                return <Notes key={note.id} data={note} remove={remove} showData={showData}/>
-              })} 
-          </ul>
-        </div>
-        <div className='py-2 px-2 w-2/3'>
-            <NoteData data={detail}/>
-        </div>
+      <div className='flex justify-between px-4'>
+        <SideOne>
+          <h1>Create New Notes</h1>
+          <Form createFunc={Create} TFB={"Create"} />
+          <List1>
+            <h1>Note list</h1>
+            {Notes.map(note => <Item1 key={note.id} note={note} removeFunc={remove} showFunc={showData} ></Item1>)}
+          </List1>
+        </SideOne>
+        <SideTwo>
+          {Detail.map(d =>
+            <List2 key={d.id}>
+              <h1>{d.name}</h1>
+              <hr className='my-2' />
+              {d.notes.map(note =>
+                <Item2 key={note.id} note={note.note}></Item2>)}
+              <hr className='my-2' />
+              <Form createFunc={addNote} TFB={"Create"} />
+            </List2>)}
+
+
+        </SideTwo>
       </div>
+
     </>
   )
 }
